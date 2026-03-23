@@ -68,7 +68,7 @@ func (a Algorithm) String() string {
 	case AlgSHA512:
 		_, err = s.WriteString("SHA512")
 	case AlgSM3:
-		_, err = s.WriteString("SM3_256")
+		_, err = s.WriteString("SM3")
 	case AlgNull:
 		_, err = s.WriteString("AlgNull")
 	case AlgRSASSA:

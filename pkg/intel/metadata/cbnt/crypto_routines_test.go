@@ -87,7 +87,7 @@ func TestAlgorithmString(t *testing.T) {
 		"sha256":      {alg: AlgSHA256, want: "SHA256"},
 		"sha384":      {alg: AlgSHA384, want: "SHA384"},
 		"sha512":      {alg: AlgSHA512, want: "SHA512"},
-		"sm3":         {alg: AlgSM3, want: "SM3_256"},
+		"sm3":         {alg: AlgSM3, want: "SM3"},
 		"alg_null":    {alg: AlgNull, want: "AlgNull"},
 		"rsassa":      {alg: AlgRSASSA, want: "RSASSA"},
 		"rsapss":      {alg: AlgRSAPSS, want: "RSAPSS"},
