@@ -17,10 +17,53 @@ This directory contains reusable definitions of common BG/CBnT structures and Bo
 ```
 
 ## cbnt
+The `cbnt` packages defines the structures that are used by both Boot Policy and Key Manifests. 
+Most of the structures are shared between Boot Guard 1.0 and CBnT, with an exception for the following:
 
+- Chipset AC Module Information
+- TPM Info List
+ 
 ## bootpolicy
+The `bootpolicy` package defines the Boot Policy Manifest and its child structures. In contrast with `cbnt`,
+there are more differences between Boot Guard 1.0 and CBnT. Therefore, the Manifest constructor make the distinction
+between the versions and returns the versioned implementation of the Manifest interface. Similar pattern is being used for
+the structures that form the Manifest. 
+
+The users of the `bootpolicy` packages should therefore make use of type assertions. These are safe in this context provided
+that the constructor is feed with the supported version, and the error is handled correctly. An example usage:
+```go
+bpm, err := bootpolicy.NewManifest(cbnt.Version10)
+if err != nil {
+	return nil, err
+}
+bgbpm = bpm.(*bootpolicy.ManifestBG)
+```
+
+From that point on, the elements of the implementation may be accessed directly, for example:
+```go
+flags := bgbpm.SE[0].Flags
+if !flags.AuthorityMeasure() {
+	return false, fmt.Errorf("pcr-7 data should extended for OS security")
+}
+if !flags.TPMFailureLeavesHierarchiesEnabled() {
+	return false, fmt.Errorf("tpm failure should lead to default measurements from PCR0 to PCR7")
+}
+```
 
 ## keymanifest
+The `keymanifest` package defines the Key Manifest. It follows the same design as `bootpolicy`. An example usage:
+```go
+km, err := keymanifest.NewManifest(b.Version)
+if err != nil {
+	return nil, err
+}
+cbntkm = km.(*keymanifest.CBnTManifest)
+
+hash := cbntkm.PubKeyHashAlg
+		if hash == cbnt.AlgSHA1 || hash.IsNull() {
+			return false, fmt.Errorf("KM signature uses insecure hash algorithm SHA1/Null")
+		}
+```
 
 ## Structure Modification/Extension
 All the structures should implement the `Structure` interface (see [`cbnt/types.go`](cbnt/types.go)):
@@ -39,7 +82,9 @@ Structure interface {
 
 The most important method of the structure is the `Layout()` as it provides the `Common.ReadFrom()`, `Common.WriteTo()`, `Common.SizeOf()` and `Common.OffsetOf()` methods
 with the information of the actual type the operation is supposed to be done. The common methods are accessed by letting all types to have `Common` struct
-as a field. Note: `Common` struct should never be included in the `Layout()`! Otherwise, it will be treated as the actual part of the CBnT data structure.
+as a field.
+> ![NOTE]
+> `Common` struct should never be included in the `Layout()`! Otherwise, it will be treated as the actual part of the CBnT data structure.
 
 ### Types with Static Sizes
 In most cases, that is, for the types that do not include fields that have their size determined at compile time, most of work is done in `Layout()`
@@ -231,7 +276,8 @@ Effectively, in such case R/W and size/offsets of sub-types will be recursively 
 As implementing entity of a type that contains fields with sub-types, there is no need to concern about **how** sub-type will perform R/W and size/offset determination, as
 long it is known that its layout is correctly defined.
 
-Note: for all dynamic fields, keep `Size()` aligned with the exact binary representation consumed/written by that field type.
+> [!NOTE]
+> for all dynamic fields, keep `Size()` aligned with the exact binary representation consumed/written by that field type.
 
 ### Field Type Quick Reference
 As described above, `Common.ReadFrom()` and `Common.WriteTo()` dispatch behavior by `LayoutField.Type`:
@@ -386,6 +432,7 @@ extend the `ManifestFieldType` constants and add corresponding handling in both
 
 ### Extending a Structure
 Let's take `SECBnT` as an example here, and assume that the update specification adds a field that stores the size of `IBBSegments`. Then we need to adapt the following:
+1. Type definition
 ```go
 type SECBnT struct {
 	cbnt.Common
@@ -412,4 +459,43 @@ type SECBnT struct {
 }
 ```
 
+2. Layout descriptor
+```go
+func (s *SECBnT) Layout() []cbnt.LayoutField {
+	return []cbnt.LayoutField{
+		{
+			ID:    0,
+			Name:  "Struct Info",
+			Size:  func() uint64 { return s.StructInfoCBNT.TotalSize() },
+			Value: func() any { return &s.StructInfoCBNT },
+			Type:  cbnt.ManifestFieldSubStruct,
+		},
+		...
+		{
+			ID:    16,
+			Name:  "Reserved 2",
+			Size:  func() uint64 { return 3 },
+			Value: func() any { return &s.Reserved2 },
+			Type:  cbnt.ManifestFieldArrayStatic,
+		},
+		// New entry
+		{
+			ID:   17,
+			Name: "Size of IBB Segments",
+			Size: func() uint64 { return 2 },
+			Value: func() any { return s.IBBSegments.TotalSize() }, // Yes, this example makes little sense, but it is more about the mechanics of the approach than logics of specification. 
+			Type: cbnt.ManifestFieldArrayDynamicWithSize,
+		}
+		{
+			ID:   18, // Incremented
+			Name: fmt.Sprintf("IBBSegments: Array of \"IBB Segments Element\" of length %d", len(s.IBBSegments)),
+			Size: func() uint64 {
+		...
+		}
+}	
+```
+
+3. Any affected API calls
+
+`SizeOf` and `OffsetOf` methods depend on the ID of a field. Thus, after modifying the layout descriptor, these have to be adjusted.
 
