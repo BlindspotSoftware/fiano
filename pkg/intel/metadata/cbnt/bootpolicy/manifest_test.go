@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/linuxboot/fiano/pkg/intel/metadata/cbnt"
-	"github.com/linuxboot/fiano/pkg/intel/metadata/common/unittest"
+	"github.com/linuxboot/fiano/pkg/intel/metadata/common/integration"
 )
 
 func TestReadWriteBG(t *testing.T) {
@@ -16,7 +16,7 @@ func TestReadWriteBG(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
-	unittest.ManifestReadWrite(t, m, "testdata/bpm10.bin")
+	integration.ManifestReadWrite(t, m, "testdata/bpm10.bin")
 }
 
 func TestReadWriteCBNT(t *testing.T) {
@@ -24,7 +24,7 @@ func TestReadWriteCBNT(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
-	unittest.ManifestReadWrite(t, m, "testdata/bpm20.bin")
+	integration.ManifestReadWrite(t, m, "testdata/bpm20.bin")
 }
 
 func TestReadWriteCBNT21(t *testing.T) {
@@ -32,5 +32,5 @@ func TestReadWriteCBNT21(t *testing.T) {
 	if err != nil {
 		t.Fatalf("%v", err)
 	}
-	unittest.ManifestReadWrite(t, m, "testdata/bpm21.bin")
+	integration.ManifestReadWrite(t, m, "testdata/bpm21.bin")
 }
