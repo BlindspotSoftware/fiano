@@ -83,7 +83,7 @@ Structure interface {
 The most important method of the structure is the `Layout()` as it provides the `Common.ReadFrom()`, `Common.WriteTo()`, `Common.SizeOf()` and `Common.OffsetOf()` methods
 with the information of the actual type the operation is supposed to be done. The common methods are accessed by letting all types to have `Common` struct
 as a field.
-> ![NOTE]
+> [!NOTE]
 > `Common` struct should never be included in the `Layout()`! Otherwise, it will be treated as the actual part of the CBnT data structure.
 
 ### Types with Static Sizes
