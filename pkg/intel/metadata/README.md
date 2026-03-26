@@ -1,5 +1,19 @@
 # Intel BG/CBnT Metadata
 
+<!--toc:start-->
+- [Intel BG/CBnT Metadata](#intel-bgcbnt-metadata)
+  - [Structure](#structure)
+  - [cbnt](#cbnt)
+  - [bootpolicy](#bootpolicy)
+  - [keymanifest](#keymanifest)
+  - [Structure Modification/Extension](#structure-modificationextension)
+    - [Types with Static Sizes](#types-with-static-sizes)
+    - [Types with Dynamic Sizes](#types-with-dynamic-sizes)
+    - [Field Type Quick Reference](#field-type-quick-reference)
+    - [Adding a Structure](#adding-a-structure)
+    - [Extending a Structure](#extending-a-structure)
+<!--toc:end-->
+
 This directory contains reusable definitions of common BG/CBnT structures and Boot Policy and Key Manifests for Intel platforms.
 
 ## Structure
@@ -499,3 +513,15 @@ func (s *SECBnT) Layout() []cbnt.LayoutField {
 
 `SizeOf` and `OffsetOf` methods depend on the ID of a field. Thus, after modifying the layout descriptor, these have to be adjusted.
 
+
+## Testing
+
+There are two types of tests used for the metadata related packages:
+
+- Unit Tests: for the structures in the `cbnt` packages.
+- Integration Tests: for manifests. These are further described in a dedicated [README](/pkg/intel/metadata/common/integration/README.md).
+
+To run all the tests:
+```bash
+go test ./cbnt
+```
