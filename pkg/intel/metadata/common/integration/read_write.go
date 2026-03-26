@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package unittest
+package integration
 
 import (
 	"bytes"
@@ -67,7 +67,6 @@ func ManifestReadWrite(t *testing.T, m cbnt.Manifest, testDataFilePath string) {
 	sizeAndOffset(t, list, m)
 
 	// Getters
-	//getValue
 	l := m.Layout()
 	field0 := l[0]
 	val := field0.Value
