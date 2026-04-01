@@ -124,21 +124,21 @@ func GetAlgFromString(name string) (Algorithm, error) {
 }
 
 // PrettyString returns the bits of the flags in an easy-to-read format.
-func (v Algorithm) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
-	return v.String()
+func (a Algorithm) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
+	return a.String()
 }
 
 // TotalSize returns the total size measured through binary.Size.
-func (v Algorithm) TotalSize() uint64 {
-	return uint64(binary.Size(v))
+func (a Algorithm) TotalSize() uint64 {
+	return uint64(binary.Size(a))
 }
 
 // WriteTo writes the Algorithm into 'w' in binary format.
-func (v Algorithm) WriteTo(w io.Writer) (int64, error) {
-	return int64(v.TotalSize()), binary.Write(w, binary.LittleEndian, v)
+func (a Algorithm) WriteTo(w io.Writer) (int64, error) {
+	return int64(a.TotalSize()), binary.Write(w, binary.LittleEndian, a)
 }
 
 // ReadFrom reads the Algorithm from 'r' in binary format.
-func (v *Algorithm) ReadFrom(r io.Reader) (int64, error) {
-	return int64(v.TotalSize()), binary.Read(r, binary.LittleEndian, v)
+func (a *Algorithm) ReadFrom(r io.Reader) (int64, error) {
+	return int64(a.TotalSize()), binary.Read(r, binary.LittleEndian, a)
 }

@@ -254,18 +254,18 @@ func (k *Key) Layout() []LayoutField {
 
 // Validate (recursively) checks the structure if there are any unexpected
 // values. It returns an error if so.
-func (s *Key) Validate() error {
+func (k *Key) Validate() error {
 	// See tag "require"
-	if s.Version != 0x10 {
-		return fmt.Errorf("field 'Version' expects value '0x10', but has %v", s.Version)
+	if k.Version != 0x10 {
+		return fmt.Errorf("field 'Version' expects value '0x10', but has %v", k.Version)
 	}
 
 	return nil
 }
 
 // ReadFrom reads the Key from 'r' in format defined in the document #575623.
-func (s *Key) ReadFrom(r io.Reader) (int64, error) {
-	totalN, err := s.Common.ReadFrom(r, s)
+func (k *Key) ReadFrom(r io.Reader) (int64, error) {
+	totalN, err := k.Common.ReadFrom(r, k)
 	if err != nil {
 		return 0, err
 	}
@@ -275,12 +275,12 @@ func (s *Key) ReadFrom(r io.Reader) (int64, error) {
 
 // WriteTo writes the Key into 'w' in format defined in
 // the document #575623.
-func (s *Key) WriteTo(w io.Writer) (int64, error) {
-	return s.Common.WriteTo(w, s)
+func (k *Key) WriteTo(w io.Writer) (int64, error) {
+	return k.Common.WriteTo(w, k)
 }
 
-func (s *Key) SizeOf(id int) (uint64, error) {
-	ret, err := s.Common.SizeOf(s, id)
+func (k *Key) SizeOf(id int) (uint64, error) {
+	ret, err := k.Common.SizeOf(k, id)
 	if err != nil {
 		// normally it would be 0, but ret is already 0 if we land here
 		return ret, fmt.Errorf("Key: %v", err)
@@ -289,8 +289,8 @@ func (s *Key) SizeOf(id int) (uint64, error) {
 	return ret, nil
 }
 
-func (s *Key) OffsetOf(id int) (uint64, error) {
-	ret, err := s.Common.OffsetOf(s, id)
+func (k *Key) OffsetOf(id int) (uint64, error) {
+	ret, err := k.Common.OffsetOf(k, id)
 	if err != nil {
 		return ret, fmt.Errorf("Key: %v", err)
 	}
@@ -299,17 +299,17 @@ func (s *Key) OffsetOf(id int) (uint64, error) {
 }
 
 // Size returns the total size of the Key.
-func (s *Key) TotalSize() uint64 {
-	if s == nil {
+func (k *Key) TotalSize() uint64 {
+	if k == nil {
 		return 0
 	}
 
-	return s.Common.TotalSize(s)
+	return k.Common.TotalSize(k)
 }
 
 // PrettyString returns the content of the structure in an easy-to-read format.
-func (s *Key) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
-	return Common{}.PrettyString(depth, withHeader, s, "Key", opts...)
+func (k *Key) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
+	return Common{}.PrettyString(depth, withHeader, k, "Key", opts...)
 }
 
 type BitSize uint16
@@ -335,27 +335,27 @@ func (ks *BitSize) SetInBytes(amountOfBytes uint16) {
 }
 
 // PrettyString returns the bits of the flags in an easy-to-read format.
-func (v BitSize) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
+func (ks BitSize) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
 	var lines []string
 	if withHeader {
-		lines = append(lines, pretty.Header(depth, "Bit Size", v))
+		lines = append(lines, pretty.Header(depth, "Bit Size", ks))
 	}
-	lines = append(lines, pretty.SubValue(depth+1, "In Bits", "", v.InBits(), opts...)...)
-	lines = append(lines, pretty.SubValue(depth+1, "In Bytes", "", v.InBytes(), opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "In Bits", "", ks.InBits(), opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "In Bytes", "", ks.InBytes(), opts...)...)
 	return strings.Join(lines, "\n")
 }
 
 // TotalSize returns the total size measured through binary.Size.
-func (v BitSize) TotalSize() uint64 {
-	return uint64(binary.Size(v))
+func (ks BitSize) TotalSize() uint64 {
+	return uint64(binary.Size(ks))
 }
 
 // WriteTo writes the BitSize into 'w' in binary format.
-func (v BitSize) WriteTo(w io.Writer) (int64, error) {
-	return int64(v.TotalSize()), binary.Write(w, binary.LittleEndian, v)
+func (ks BitSize) WriteTo(w io.Writer) (int64, error) {
+	return int64(ks.TotalSize()), binary.Write(w, binary.LittleEndian, ks)
 }
 
 // ReadFrom reads the BitSize from 'r' in binary format.
-func (v BitSize) ReadFrom(r io.Reader) (int64, error) {
-	return int64(v.TotalSize()), binary.Read(r, binary.LittleEndian, v)
+func (ks BitSize) ReadFrom(r io.Reader) (int64, error) {
+	return int64(ks.TotalSize()), binary.Read(r, binary.LittleEndian, ks)
 }

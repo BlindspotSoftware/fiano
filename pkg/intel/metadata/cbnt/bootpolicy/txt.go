@@ -298,23 +298,23 @@ func (s *TXT) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) s
 type Duration16In5Sec uint16
 
 // PrettyString returns the bits of the flags in an easy-to-read format.
-func (v Duration16In5Sec) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
-	return v.String()
+func (d Duration16In5Sec) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
+	return d.String()
 }
 
 // TotalSize returns the total size measured through binary.Size.
-func (v Duration16In5Sec) TotalSize() uint64 {
-	return uint64(binary.Size(v))
+func (d Duration16In5Sec) TotalSize() uint64 {
+	return uint64(binary.Size(d))
 }
 
 // WriteTo writes the Duration16In5Sec into 'w' in binary format.
-func (v Duration16In5Sec) WriteTo(w io.Writer) (int64, error) {
-	return int64(v.TotalSize()), binary.Write(w, binary.LittleEndian, v)
+func (d Duration16In5Sec) WriteTo(w io.Writer) (int64, error) {
+	return int64(d.TotalSize()), binary.Write(w, binary.LittleEndian, d)
 }
 
 // ReadFrom reads the Duration16In5Sec from 'r' in binary format.
-func (v Duration16In5Sec) ReadFrom(r io.Reader) (int64, error) {
-	return int64(v.TotalSize()), binary.Read(r, binary.LittleEndian, v)
+func (d Duration16In5Sec) ReadFrom(r io.Reader) (int64, error) {
+	return int64(d.TotalSize()), binary.Read(r, binary.LittleEndian, d)
 }
 
 // Duration calculates a given time in multiple of 5 seconds.

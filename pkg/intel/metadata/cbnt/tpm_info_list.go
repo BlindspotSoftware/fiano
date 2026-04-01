@@ -168,30 +168,40 @@ func (v TPM2PCRExtendPolicySupport) ReadFrom(r io.Reader) (int64, error) {
 // TPMCapabilities defines TPM capabilities
 type TPMCapabilities uint32
 
+// TPM2PCRExtendPolicySupport returns TPM2PCRExtendPolicySupport
+func (cap TPMCapabilities) TPM2PCRExtendPolicySupport() TPM2PCRExtendPolicySupport {
+	return TPM2PCRExtendPolicySupport(cap & 3)
+}
+
+// TPMFamilySupport returns TPMFamilySupport
+func (cap TPMCapabilities) TPMFamilySupport() TPMFamilySupport {
+	return TPMFamilySupport((cap >> 2) & 15)
+}
+
 // PrettyString returns the bits of the flags in an easy-to-read format.
-func (v TPMCapabilities) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
+func (cap TPMCapabilities) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
 	var lines []string
 	if withHeader {
-		lines = append(lines, pretty.Header(depth, "TPM Capabilities", v))
+		lines = append(lines, pretty.Header(depth, "TPM Capabilities", cap))
 	}
-	lines = append(lines, pretty.SubValue(depth+1, "TPM 2 PCR Extend Policy Support", "", v.TPM2PCRExtendPolicySupport(), opts...)...)
-	lines = append(lines, pretty.SubValue(depth+1, "TPM Family Support", "", v.TPMFamilySupport(), opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "TPM 2 PCR Extend Policy Support", "", cap.TPM2PCRExtendPolicySupport(), opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "TPM Family Support", "", cap.TPMFamilySupport(), opts...)...)
 	return strings.Join(lines, "\n")
 }
 
 // TotalSize returns the total size measured through binary.Size.
-func (v TPMCapabilities) TotalSize() uint64 {
-	return uint64(binary.Size(v))
+func (cap TPMCapabilities) TotalSize() uint64 {
+	return uint64(binary.Size(cap))
 }
 
 // WriteTo writes the TPMCapabilities into 'w' in binary format.
-func (v TPMCapabilities) WriteTo(w io.Writer) (int64, error) {
-	return int64(v.TotalSize()), binary.Write(w, binary.LittleEndian, v)
+func (cap TPMCapabilities) WriteTo(w io.Writer) (int64, error) {
+	return int64(cap.TotalSize()), binary.Write(w, binary.LittleEndian, cap)
 }
 
 // ReadFrom reads the TPMCapabilities from 'r' in binary format.
-func (v TPMCapabilities) ReadFrom(r io.Reader) (int64, error) {
-	return int64(v.TotalSize()), binary.Read(r, binary.LittleEndian, v)
+func (cap TPMCapabilities) ReadFrom(r io.Reader) (int64, error) {
+	return int64(cap.TotalSize()), binary.Read(r, binary.LittleEndian, cap)
 }
 
 // TPMFamilySupport defines TPM family support
@@ -239,30 +249,20 @@ func (v TPMFamilySupport) ReadFrom(r io.Reader) (int64, error) {
 // IsDiscreteTPM12Supported returns true if discrete TPM1.2 is supported.
 // PrettyString-true:  Discrete TPM1.2 is supported
 // PrettyString-false: Discrete TPM1.2 is not supported
-func (familySupport TPMFamilySupport) IsDiscreteTPM12Supported() bool {
-	return familySupport&1 != 0
+func (v TPMFamilySupport) IsDiscreteTPM12Supported() bool {
+	return v&1 != 0
 }
 
 // IsDiscreteTPM20Supported returns true if discrete TPM2.0 is supported.
 // PrettyString-true:  Discrete TPM2.0 is supported
 // PrettyString-false: Discrete TPM2.0 is not supported
-func (familySupport TPMFamilySupport) IsDiscreteTPM20Supported() bool {
-	return familySupport&2 != 0
+func (v TPMFamilySupport) IsDiscreteTPM20Supported() bool {
+	return v&2 != 0
 }
 
 // IsFirmwareTPM20Supported returns true if firmware TPM2.0 is supported.
 // PrettyString-true:  Firmware TPM2.0 is supported
 // PrettyString-false: Firmware TPM2.0 is not supported
-func (familySupport TPMFamilySupport) IsFirmwareTPM20Supported() bool {
-	return familySupport&(1<<3) != 0
-}
-
-// TPM2PCRExtendPolicySupport returns TPM2PCRExtendPolicySupport
-func (cap TPMCapabilities) TPM2PCRExtendPolicySupport() TPM2PCRExtendPolicySupport {
-	return TPM2PCRExtendPolicySupport(cap & 3)
-}
-
-// TPMFamilySupport returns TPMFamilySupport
-func (cap TPMCapabilities) TPMFamilySupport() TPMFamilySupport {
-	return TPMFamilySupport((cap >> 2) & 15)
+func (v TPMFamilySupport) IsFirmwareTPM20Supported() bool {
+	return v&(1<<3) != 0
 }

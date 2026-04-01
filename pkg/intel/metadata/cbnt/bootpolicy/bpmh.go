@@ -378,8 +378,8 @@ func (s *BPMHBG) PrettyString(depth uint, withHeader bool, opts ...pretty.Option
 type Size4K uint16
 
 // InBytes returns the size in bytes.
-func (s Size4K) InBytes() uint32 {
-	return uint32(s) * 4096
+func (v Size4K) InBytes() uint32 {
+	return uint32(v) * 4096
 }
 
 // NewSize4K returns the given size as multiple of 4K

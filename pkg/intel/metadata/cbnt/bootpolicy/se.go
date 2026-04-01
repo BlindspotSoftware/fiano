@@ -809,61 +809,61 @@ func (v CachingType) ReadFrom(r io.Reader) (int64, error) {
 type PBETValue uint8
 
 // PrettyString returns the bits of the flags in an easy-to-read format.
-func (v PBETValue) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
+func (pbet PBETValue) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
 	var lines []string
 	if withHeader {
-		lines = append(lines, pretty.Header(depth, "PBET Value", v))
+		lines = append(lines, pretty.Header(depth, "PBET Value", pbet))
 	}
-	lines = append(lines, pretty.SubValue(depth+1, "PBET Value", "", v.PBETValue(), opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "PBET Value", "", pbet.PBETValue(), opts...)...)
 	return strings.Join(lines, "\n")
 }
 
 // TotalSize returns the total size measured through binary.Size.
-func (v PBETValue) TotalSize() uint64 {
-	return uint64(binary.Size(v))
+func (pbet PBETValue) TotalSize() uint64 {
+	return uint64(binary.Size(pbet))
 }
 
 // WriteTo writes the PBETValue into 'w' in binary format.
-func (v PBETValue) WriteTo(w io.Writer) (int64, error) {
-	return int64(v.TotalSize()), binary.Write(w, binary.LittleEndian, v)
+func (pbet PBETValue) WriteTo(w io.Writer) (int64, error) {
+	return int64(pbet.TotalSize()), binary.Write(w, binary.LittleEndian, pbet)
 }
 
 // ReadFrom reads the PBETValue from 'r' in binary format.
-func (v PBETValue) ReadFrom(r io.Reader) (int64, error) {
-	return int64(v.TotalSize()), binary.Read(r, binary.LittleEndian, v)
+func (pbet PBETValue) ReadFrom(r io.Reader) (int64, error) {
+	return int64(pbet.TotalSize()), binary.Read(r, binary.LittleEndian, pbet)
 }
 
 // SEFlags <TO BE DOCUMENTED>
 type SEFlags uint32
 
 // PrettyString returns the bits of the flags in an easy-to-read format.
-func (v SEFlags) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
+func (flags SEFlags) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
 	var lines []string
 	if withHeader {
-		lines = append(lines, pretty.Header(depth, "SE Flags", v))
+		lines = append(lines, pretty.Header(depth, "SE Flags", flags))
 	}
-	lines = append(lines, pretty.SubValue(depth+1, "Reserved 0", "", v.Reserved0(), opts...)...)
-	if v.SupportsTopSwapRemediation() {
+	lines = append(lines, pretty.SubValue(depth+1, "Reserved 0", "", flags.Reserved0(), opts...)...)
+	if flags.SupportsTopSwapRemediation() {
 		lines = append(lines, pretty.SubValue(depth+1, "Supports Top Swap Remediation", "BIOS supports Top Swap remediation action", true, opts...)...)
 	} else {
 		lines = append(lines, pretty.SubValue(depth+1, "Supports Top Swap Remediation", "BIOS does not support Top Swap remediation action", false, opts...)...)
 	}
-	if v.TPMFailureLeavesHierarchiesEnabled() {
+	if flags.TPMFailureLeavesHierarchiesEnabled() {
 		lines = append(lines, pretty.SubValue(depth+1, "TPM Failure Leaves Hierarchies Enabled", "Leave Hierarchies enabled. Cap all PCRs on failure.", true, opts...)...)
 	} else {
 		lines = append(lines, pretty.SubValue(depth+1, "TPM Failure Leaves Hierarchies Enabled", "Do not leave enabled. Disable all Hierarchies or deactivate on failure.", false, opts...)...)
 	}
-	if v.AuthorityMeasure() {
+	if flags.AuthorityMeasure() {
 		lines = append(lines, pretty.SubValue(depth+1, "Authority Measure", "Extend Authority Measurements into the Authority PCR 7", true, opts...)...)
 	} else {
 		lines = append(lines, pretty.SubValue(depth+1, "Authority Measure", "Do not extend into the Authority PCR 7", false, opts...)...)
 	}
-	if v.Locality3Startup() {
+	if flags.Locality3Startup() {
 		lines = append(lines, pretty.SubValue(depth+1, "Locality 3 Startup", "Issue TPM Start-up from Locality 3", true, opts...)...)
 	} else {
 		lines = append(lines, pretty.SubValue(depth+1, "Locality 3 Startup", "Disabled", false, opts...)...)
 	}
-	if v.DMAProtection() {
+	if flags.DMAProtection() {
 		lines = append(lines, pretty.SubValue(depth+1, "DMA Protection", "Enable DMA Protection", true, opts...)...)
 	} else {
 		lines = append(lines, pretty.SubValue(depth+1, "DMA Protection", "Disable DMA Protection", false, opts...)...)
@@ -872,18 +872,18 @@ func (v SEFlags) PrettyString(depth uint, withHeader bool, opts ...pretty.Option
 }
 
 // TotalSize returns the total size measured through binary.Size.
-func (v SEFlags) TotalSize() uint64 {
-	return uint64(binary.Size(v))
+func (flags SEFlags) TotalSize() uint64 {
+	return uint64(binary.Size(flags))
 }
 
 // WriteTo writes the SEFlags into 'w' in binary format.
-func (v SEFlags) WriteTo(w io.Writer) (int64, error) {
-	return int64(v.TotalSize()), binary.Write(w, binary.LittleEndian, v)
+func (flags SEFlags) WriteTo(w io.Writer) (int64, error) {
+	return int64(flags.TotalSize()), binary.Write(w, binary.LittleEndian, flags)
 }
 
 // ReadFrom reads the SEFlags from 'r' in binary format.
-func (v SEFlags) ReadFrom(r io.Reader) (int64, error) {
-	return int64(v.TotalSize()), binary.Read(r, binary.LittleEndian, v)
+func (flags SEFlags) ReadFrom(r io.Reader) (int64, error) {
+	return int64(flags.TotalSize()), binary.Read(r, binary.LittleEndian, flags)
 }
 
 // PBETValue returns the raw value of the timer setting.
@@ -962,8 +962,8 @@ func (flags SEFlags) DMAProtection() bool {
 }
 
 // String implements fmt.Stringer.
-func (c CachingType) String() string {
-	switch c {
+func (v CachingType) String() string {
+	switch v {
 	case CachingTypeWriteProtect:
 		return "write_protect"
 	case CachingTypeWriteBack:
@@ -973,5 +973,5 @@ func (c CachingType) String() string {
 	case CachingTypeReserved1:
 		return "value_0x03"
 	}
-	return fmt.Sprintf("unexpected_value_0x%02X", uint8(c))
+	return fmt.Sprintf("unexpected_value_0x%02X", uint8(v))
 }

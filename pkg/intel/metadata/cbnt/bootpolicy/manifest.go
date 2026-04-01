@@ -544,18 +544,18 @@ func (s *ManifestBG) SetStructInfo(newStructInfo cbnt.StructInfo) {
 	s.StructInfoBG = newStructInfo.(cbnt.StructInfoBG)
 }
 
-func (bpm *ManifestBG) ValidateIBB(firmware uefi.Firmware) error {
-	if bpm.SE[0].Digest.TotalSize() == 0 {
+func (s *ManifestBG) ValidateIBB(firmware uefi.Firmware) error {
+	if s.SE[0].Digest.TotalSize() == 0 {
 		return fmt.Errorf("no IBB hashes")
 	}
 
-	digest := bpm.SE[0].Digest
+	digest := s.SE[0].Digest
 	h, err := digest.HashAlg.Hash()
 	if err != nil {
 		return fmt.Errorf("invalid hash function: %v", digest.HashAlg)
 	}
 
-	for _, r := range bpm.IBBDataRanges(uint64(len(firmware.Buf()))) {
+	for _, r := range s.IBBDataRanges(uint64(len(firmware.Buf()))) {
 		if _, err := h.Write(firmware.Buf()[r.Offset:r.End()]); err != nil {
 			return fmt.Errorf("unable to hash: %w", err)
 		}
@@ -570,31 +570,31 @@ func (bpm *ManifestBG) ValidateIBB(firmware uefi.Firmware) error {
 }
 
 // IBBDataRanges returns data ranges of IBB.
-func (bpm *ManifestBG) IBBDataRanges(firmwareSize uint64) pkgbytes.Ranges {
-	return ibbDataRanges(bpm.SE[0].IBBSegments, firmwareSize)
+func (s *ManifestBG) IBBDataRanges(firmwareSize uint64) pkgbytes.Ranges {
+	return ibbDataRanges(s.SE[0].IBBSegments, firmwareSize)
 }
 
-func (bpm *ManifestBG) rehashedBPMH() BPMHBG {
-	return bpm.BPMHBG
+func (s *ManifestBG) rehashedBPMH() BPMHBG {
+	return s.BPMHBG
 }
 
-func (bpm ManifestBG) Print() {
-	fmt.Printf("%v", bpm.BPMHBG.PrettyString(1, true))
-	for _, item := range bpm.SE {
+func (s ManifestBG) Print() {
+	fmt.Printf("%v", s.BPMHBG.PrettyString(1, true))
+	for _, item := range s.SE {
 		fmt.Printf("%v", item.PrettyString(1, true))
 	}
 
-	if bpm.PME != nil {
-		fmt.Printf("%v\n", bpm.PME.PrettyString(1, true))
+	if s.PME != nil {
+		fmt.Printf("%v\n", s.PME.PrettyString(1, true))
 	} else {
 		fmt.Println("  --PME--\n\tnot set!(optional)")
 	}
 
-	if len(bpm.PMSE.Signature.Data) < 1 {
-		fmt.Printf("%v\n", bpm.PMSE.PrettyString(1, true, pretty.OptionOmitKeySignature(true)))
+	if len(s.PMSE.Signature.Data) < 1 {
+		fmt.Printf("%v\n", s.PMSE.PrettyString(1, true, pretty.OptionOmitKeySignature(true)))
 		fmt.Printf("  --PMSE--\n\tBoot Policy Manifest not signed!\n\n")
 	} else {
-		fmt.Printf("%v\n", bpm.PMSE.PrettyString(1, true, pretty.OptionOmitKeySignature(false)))
+		fmt.Printf("%v\n", s.PMSE.PrettyString(1, true, pretty.OptionOmitKeySignature(false)))
 	}
 }
 
@@ -991,18 +991,18 @@ func (s *ManifestCBnT) SetStructInfo(newStructInfo cbnt.StructInfo) {
 }
 
 // ValidateIBB returns an error if IBB segments does not match the signature.
-func (bpm *ManifestCBnT) ValidateIBB(firmware uefi.Firmware) error {
-	if len(bpm.SE[0].DigestList.List) == 0 {
+func (s *ManifestCBnT) ValidateIBB(firmware uefi.Firmware) error {
+	if len(s.SE[0].DigestList.List) == 0 {
 		return fmt.Errorf("no IBB hashes")
 	}
 
-	digest := bpm.SE[0].DigestList.List[0]
+	digest := s.SE[0].DigestList.List[0]
 	h, err := digest.HashAlg.Hash()
 	if err != nil {
 		return fmt.Errorf("invalid hash function: %v", digest.HashAlg)
 	}
 
-	for _, r := range bpm.IBBDataRanges(uint64(len(firmware.Buf()))) {
+	for _, r := range s.IBBDataRanges(uint64(len(firmware.Buf()))) {
 		if _, err := h.Write(firmware.Buf()[r.Offset:r.End()]); err != nil {
 			return fmt.Errorf("unable to hash: %w", err)
 		}
@@ -1017,8 +1017,8 @@ func (bpm *ManifestCBnT) ValidateIBB(firmware uefi.Firmware) error {
 }
 
 // IBBDataRanges returns data ranges of IBB.
-func (bpm *ManifestCBnT) IBBDataRanges(firmwareSize uint64) pkgbytes.Ranges {
-	return ibbDataRanges(bpm.SE[0].IBBSegments, firmwareSize)
+func (s *ManifestCBnT) IBBDataRanges(firmwareSize uint64) pkgbytes.Ranges {
+	return ibbDataRanges(s.SE[0].IBBSegments, firmwareSize)
 }
 
 // Helper for IBBDataRanges. Moved to the separate func cause the logic is shared between
@@ -1044,41 +1044,41 @@ func calculateOffsetFromPhysAddr(physAddr uint64, imageSize uint64) uint64 {
 	return physAddr - startAddr
 }
 
-func (bpm *ManifestCBnT) rehashedBPMH() BPMHCBnT {
-	bpmh := bpm.BPMHCBnT
-	pmseOffs, _ := bpm.OffsetOf(6)
-	keySigOffs, _ := bpm.PMSE.OffsetOf(1)
+func (s *ManifestCBnT) rehashedBPMH() BPMHCBnT {
+	bpmh := s.BPMHCBnT
+	pmseOffs, _ := s.OffsetOf(6)
+	keySigOffs, _ := s.PMSE.OffsetOf(1)
 	bpmh.KeySignatureOffset = uint16(pmseOffs + keySigOffs)
 	return bpmh
 }
 
-func (bpm ManifestCBnT) Print() {
-	fmt.Printf("%v", bpm.BPMHCBnT.PrettyString(1, true))
-	for _, item := range bpm.SE {
+func (s ManifestCBnT) Print() {
+	fmt.Printf("%v", s.BPMHCBnT.PrettyString(1, true))
+	for _, item := range s.SE {
 		fmt.Printf("%v", item.PrettyString(1, true))
 	}
-	if bpm.TXTE != nil {
-		fmt.Printf("%v\n", bpm.TXTE.PrettyString(1, true))
+	if s.TXTE != nil {
+		fmt.Printf("%v\n", s.TXTE.PrettyString(1, true))
 	} else {
 		fmt.Printf("  --TXTE--\n\t not set!(optional)\n")
 	}
 
-	if bpm.PCDE != nil {
-		fmt.Printf("%v\n", bpm.PCDE.PrettyString(1, true))
+	if s.PCDE != nil {
+		fmt.Printf("%v\n", s.PCDE.PrettyString(1, true))
 	} else {
 		fmt.Println("  --PCDE-- \n\tnot set!(optional)")
 	}
 
-	if bpm.PME != nil {
-		fmt.Printf("%v\n", bpm.PME.PrettyString(1, true))
+	if s.PME != nil {
+		fmt.Printf("%v\n", s.PME.PrettyString(1, true))
 	} else {
 		fmt.Println("  --PME--\n\tnot set!(optional)")
 	}
 
-	if len(bpm.PMSE.Signature.Data) < 1 {
-		fmt.Printf("%v\n", bpm.PMSE.PrettyString(1, true, pretty.OptionOmitKeySignature(true)))
+	if len(s.PMSE.Signature.Data) < 1 {
+		fmt.Printf("%v\n", s.PMSE.PrettyString(1, true, pretty.OptionOmitKeySignature(true)))
 		fmt.Printf("  --PMSE--\n\tBoot Policy Manifest not signed!\n\n")
 	} else {
-		fmt.Printf("%v\n", bpm.PMSE.PrettyString(1, true, pretty.OptionOmitKeySignature(false)))
+		fmt.Printf("%v\n", s.PMSE.PrettyString(1, true, pretty.OptionOmitKeySignature(false)))
 	}
 }

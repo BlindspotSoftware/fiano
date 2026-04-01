@@ -68,13 +68,13 @@ func (m *BGManifest) ValidateBPMKey(bpmKS cbnt.KeySignature) error {
 
 // Validate (recursively) checks the structure if there are any unexpected
 // values. It returns an error if so.
-func (s *BGManifest) Validate() error {
+func (m *BGManifest) Validate() error {
 	// Recursively validating a child structure:
 	// if err := s.BPKey.Validate(); err != nil {
 	// 	return fmt.Errorf("error on field 'BPKey': %w", err)
 	// }
 	// Recursively validating a child structure:
-	if err := s.KeyAndSignature.Validate(); err != nil {
+	if err := m.KeyAndSignature.Validate(); err != nil {
 		return fmt.Errorf("error on field 'KeyAndSignature': %w", err)
 	}
 
@@ -89,78 +89,78 @@ const StructureIDManifest = "__KEYM__"
 //
 // StructInfo is a set of standard fields with presented in any element
 // ("element" in terms of document #575623).
-func (s *BGManifest) GetStructInfo() cbnt.StructInfo {
-	return s.StructInfoBG
+func (m *BGManifest) GetStructInfo() cbnt.StructInfo {
+	return m.StructInfoBG
 }
 
 // SetStructInfo sets new value of StructInfo to the structure.
 //
 // StructInfo is a set of standard fields with presented in any element
 // ("element" in terms of document #575623).
-func (s *BGManifest) SetStructInfo(newStructInfo cbnt.StructInfo) {
-	s.StructInfoBG = newStructInfo.(cbnt.StructInfoBG)
+func (m *BGManifest) SetStructInfo(newStructInfo cbnt.StructInfo) {
+	m.StructInfoBG = newStructInfo.(cbnt.StructInfoBG)
 }
 
 // ReadFrom reads the Manifest from 'r' in format defined in the document #575623.
-func (s *BGManifest) ReadFrom(r io.Reader) (int64, error) {
-	return s.Common.ReadFrom(r, s)
+func (m *BGManifest) ReadFrom(r io.Reader) (int64, error) {
+	return m.Common.ReadFrom(r, m)
 }
 
 // WriteTo writes the Manifest into 'w' in format defined in
 // the document #575623.
-func (s *BGManifest) WriteTo(w io.Writer) (int64, error) {
-	return s.Common.WriteTo(w, s)
+func (m *BGManifest) WriteTo(w io.Writer) (int64, error) {
+	return m.Common.WriteTo(w, m)
 }
 
-func (s *BGManifest) Layout() []cbnt.LayoutField {
+func (m *BGManifest) Layout() []cbnt.LayoutField {
 	return []cbnt.LayoutField{
 		{
 			ID:    0,
 			Name:  "Struct Info",
-			Size:  func() uint64 { return s.StructInfoBG.TotalSize() },
-			Value: func() any { return s.StructInfoBG },
+			Size:  func() uint64 { return m.StructInfoBG.TotalSize() },
+			Value: func() any { return m.StructInfoBG },
 			Type:  cbnt.ManifestFieldSubStruct,
 		},
 		{
 			ID:    1,
 			Name:  "KM Version",
 			Size:  func() uint64 { return 1 },
-			Value: func() any { return &s.KMVersion },
+			Value: func() any { return &m.KMVersion },
 			Type:  cbnt.ManifestFieldEndValue,
 		},
 		{
 			ID:    2,
 			Name:  "KMSVN",
 			Size:  func() uint64 { return 1 },
-			Value: func() any { return &s.KMSVN },
+			Value: func() any { return &m.KMSVN },
 			Type:  cbnt.ManifestFieldEndValue,
 		},
 		{
 			ID:    3,
 			Name:  "KMID",
 			Size:  func() uint64 { return 1 },
-			Value: func() any { return &s.KMID },
+			Value: func() any { return &m.KMID },
 			Type:  cbnt.ManifestFieldEndValue,
 		},
 		{
 			ID:    4,
 			Name:  "BP Key",
-			Size:  func() uint64 { return s.BPKey.TotalSize() },
-			Value: func() any { return &s.BPKey },
+			Size:  func() uint64 { return m.BPKey.TotalSize() },
+			Value: func() any { return &m.BPKey },
 			Type:  cbnt.ManifestFieldSubStruct,
 		},
 		{
 			ID:    5,
 			Name:  "Key And Signature",
-			Size:  func() uint64 { return s.KeyAndSignature.TotalSize() },
-			Value: func() any { return &s.KeyAndSignature },
+			Size:  func() uint64 { return m.KeyAndSignature.TotalSize() },
+			Value: func() any { return &m.KeyAndSignature },
 			Type:  cbnt.ManifestFieldSubStruct,
 		},
 	}
 }
 
-func (s *BGManifest) SizeOf(id int) (uint64, error) {
-	ret, err := s.Common.SizeOf(s, id)
+func (m *BGManifest) SizeOf(id int) (uint64, error) {
+	ret, err := m.Common.SizeOf(m, id)
 	if err != nil {
 		return ret, fmt.Errorf("CBnTManifest: %v", err)
 	}
@@ -168,8 +168,8 @@ func (s *BGManifest) SizeOf(id int) (uint64, error) {
 	return ret, nil
 }
 
-func (s *BGManifest) OffsetOf(id int) (uint64, error) {
-	ret, err := s.Common.OffsetOf(s, id)
+func (m *BGManifest) OffsetOf(id int) (uint64, error) {
+	ret, err := m.Common.OffsetOf(m, id)
 	if err != nil {
 		return ret, fmt.Errorf("CBnTManifest: %v", err)
 	}
@@ -178,17 +178,17 @@ func (s *BGManifest) OffsetOf(id int) (uint64, error) {
 }
 
 // Size returns the total size of the Manifest.
-func (s *BGManifest) TotalSize() uint64 {
-	if s == nil {
+func (m *BGManifest) TotalSize() uint64 {
+	if m == nil {
 		return 0
 	}
 
-	return s.Common.TotalSize(s)
+	return m.Common.TotalSize(m)
 }
 
 // PrettyString returns the content of the structure in an easy-to-read format.
-func (s *BGManifest) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
-	return s.Common.PrettyString(depth, withHeader, s, "BG Key Manifest", opts...)
+func (m *BGManifest) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
+	return m.Common.PrettyString(depth, withHeader, m, "BG Key Manifest", opts...)
 }
 
 func (m *BGManifest) Print() {

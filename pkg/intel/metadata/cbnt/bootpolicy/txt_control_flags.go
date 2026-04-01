@@ -135,36 +135,36 @@ func (v ResetAUXControl) ReadFrom(r io.Reader) (int64, error) {
 type TXTControlFlags uint32
 
 // PrettyString returns the bits of the flags in an easy-to-read format.
-func (v TXTControlFlags) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
+func (flags TXTControlFlags) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
 	var lines []string
 	if withHeader {
-		lines = append(lines, pretty.Header(depth, "TXT Control Flags", v))
+		lines = append(lines, pretty.Header(depth, "TXT Control Flags", flags))
 	}
-	lines = append(lines, pretty.SubValue(depth+1, "Execution Profile", "", v.ExecutionProfile(), opts...)...)
-	lines = append(lines, pretty.SubValue(depth+1, "Memory Scrubbing Policy", "", v.MemoryScrubbingPolicy(), opts...)...)
-	lines = append(lines, pretty.SubValue(depth+1, "Backup Action Policy", "", v.BackupActionPolicy(), opts...)...)
-	if v.IsSACMRequestedToExtendStaticPCRs() {
+	lines = append(lines, pretty.SubValue(depth+1, "Execution Profile", "", flags.ExecutionProfile(), opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "Memory Scrubbing Policy", "", flags.MemoryScrubbingPolicy(), opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "Backup Action Policy", "", flags.BackupActionPolicy(), opts...)...)
+	if flags.IsSACMRequestedToExtendStaticPCRs() {
 		lines = append(lines, pretty.SubValue(depth+1, "Is SACM Requested To Extend Static PC Rs", "Default setting. S-ACM is requested to extend static PCRs", true, opts...)...)
 	} else {
 		lines = append(lines, pretty.SubValue(depth+1, "Is SACM Requested To Extend Static PC Rs", "S-ACM is not requested to extend static PCRs", false, opts...)...)
 	}
-	lines = append(lines, pretty.SubValue(depth+1, "Reset AUX Control", "", v.ResetAUXControl(), opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "Reset AUX Control", "", flags.ResetAUXControl(), opts...)...)
 	return strings.Join(lines, "\n")
 }
 
 // TotalSize returns the total size measured through binary.Size.
-func (v TXTControlFlags) TotalSize() uint64 {
-	return uint64(binary.Size(v))
+func (flags TXTControlFlags) TotalSize() uint64 {
+	return uint64(binary.Size(flags))
 }
 
 // WriteTo writes the TXTControlFlags into 'w' in binary format.
-func (v TXTControlFlags) WriteTo(w io.Writer) (int64, error) {
-	return int64(v.TotalSize()), binary.Write(w, binary.LittleEndian, v)
+func (flags TXTControlFlags) WriteTo(w io.Writer) (int64, error) {
+	return int64(flags.TotalSize()), binary.Write(w, binary.LittleEndian, flags)
 }
 
 // ReadFrom reads the TXTControlFlags from 'r' in binary format.
-func (v TXTControlFlags) ReadFrom(r io.Reader) (int64, error) {
-	return int64(v.TotalSize()), binary.Read(r, binary.LittleEndian, v)
+func (flags TXTControlFlags) ReadFrom(r io.Reader) (int64, error) {
+	return int64(flags.TotalSize()), binary.Read(r, binary.LittleEndian, flags)
 }
 
 func (flags TXTControlFlags) ExecutionProfile() ExecutionProfile {
@@ -172,8 +172,8 @@ func (flags TXTControlFlags) ExecutionProfile() ExecutionProfile {
 }
 
 // String just implements fmt.Stringer.
-func (p ExecutionProfile) String() string {
-	switch p {
+func (v ExecutionProfile) String() string {
+	switch v {
 	case ExecutionProfileA:
 		return `A (use default selection based on differentation between clients, UP, and MP servers)`
 	case ExecutionProfileB:
@@ -181,7 +181,7 @@ func (p ExecutionProfile) String() string {
 	case ExecutionProfileC:
 		return `C (use "Client model": do not measure BIOS into D-PCRs; use ACHECK-based alias check)`
 	}
-	return fmt.Sprintf("unexpected_execution_profile_value_0x%02X", uint8(p))
+	return fmt.Sprintf("unexpected_execution_profile_value_0x%02X", uint8(v))
 }
 
 func (flags TXTControlFlags) MemoryScrubbingPolicy() MemoryScrubbingPolicy {
@@ -189,8 +189,8 @@ func (flags TXTControlFlags) MemoryScrubbingPolicy() MemoryScrubbingPolicy {
 }
 
 // String implements fmt.Stringer.
-func (policy MemoryScrubbingPolicy) String() string {
-	switch policy {
+func (v MemoryScrubbingPolicy) String() string {
+	switch v {
 	case MemoryScrubbingPolicyDefault:
 		return "BIOS if verified or backup action othersize"
 	case MemoryScrubbingPolicyBIOS:
@@ -198,7 +198,7 @@ func (policy MemoryScrubbingPolicy) String() string {
 	case MemoryScrubbingPolicySACM:
 		return "S-ACM"
 	}
-	return fmt.Sprintf("unexpected_value_0x%02X", uint8(policy))
+	return fmt.Sprintf("unexpected_value_0x%02X", uint8(v))
 }
 
 func (flags TXTControlFlags) BackupActionPolicy() BackupActionPolicy {
@@ -206,8 +206,8 @@ func (flags TXTControlFlags) BackupActionPolicy() BackupActionPolicy {
 }
 
 // String implements fmt.Stringer.
-func (policy BackupActionPolicy) String() string {
-	switch policy {
+func (v BackupActionPolicy) String() string {
+	switch v {
 	case BackupActionPolicyDefault:
 		return "memory power down if profile D or BtG unbreakable shutdown otherwise"
 	case BackupActionPolicyForceMemoryPowerDown:
@@ -215,7 +215,7 @@ func (policy BackupActionPolicy) String() string {
 	case BackupActionPolicyForceBtGUnbreakableShutdown:
 		return "BtG unbreakable shutdown"
 	}
-	return fmt.Sprintf("unexpected_value_0x%02X", uint8(policy))
+	return fmt.Sprintf("unexpected_value_0x%02X", uint8(v))
 }
 
 // PrettyString-true:  Default setting. S-ACM is requested to extend static PCRs
@@ -229,12 +229,12 @@ func (flags TXTControlFlags) ResetAUXControl() ResetAUXControl {
 }
 
 // String implements fmt.Stringer.
-func (c ResetAUXControl) String() string {
-	switch c {
+func (v ResetAUXControl) String() string {
+	switch v {
 	case ResetAUXControlResetAUXIndex:
 		return "AUX reset leaf will reset AUX index"
 	case ResetAUXControlDeleteAUXIndex:
 		return "AUX reset leaf will delete AUX index"
 	}
-	return fmt.Sprintf("unexpected_value_0x%02X", uint8(c))
+	return fmt.Sprintf("unexpected_value_0x%02X", uint8(v))
 }

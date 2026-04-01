@@ -115,17 +115,17 @@ func (m *CBnTManifest) ValidateBPMKey(bpmKS cbnt.KeySignature) error {
 	return nil
 }
 
-func (s *CBnTManifest) Validate() error {
-	v, err := s.OffsetOf(8)
+func (m *CBnTManifest) Validate() error {
+	v, err := m.OffsetOf(8)
 	if err != nil {
 		return fmt.Errorf("error on field 'KeyAndSignature': %w", err)
 	}
 	expectedValue := uint16(v)
-	if s.KeyManifestSignatureOffset != expectedValue {
-		return fmt.Errorf("field 'KeyManifestSignatureOffset' expects write-value '%v', but has %v", expectedValue, s.KeyManifestSignatureOffset)
+	if m.KeyManifestSignatureOffset != expectedValue {
+		return fmt.Errorf("field 'KeyManifestSignatureOffset' expects write-value '%v', but has %v", expectedValue, m.KeyManifestSignatureOffset)
 	}
 	// Recursively validating a child structure:
-	if err := s.KeyAndSignature.Validate(); err != nil {
+	if err := m.KeyAndSignature.Validate(); err != nil {
 		return fmt.Errorf("error on field 'KeyAndSignature': %w", err)
 	}
 
@@ -136,109 +136,109 @@ func (s *CBnTManifest) Validate() error {
 //
 // StructInfo is a set of standard fields with presented in any element
 // ("element" in terms of document #575623).
-func (s *CBnTManifest) GetStructInfo() cbnt.StructInfo {
-	return s.StructInfoCBNT
+func (m *CBnTManifest) GetStructInfo() cbnt.StructInfo {
+	return m.StructInfoCBNT
 }
 
 // SetStructInfo sets new value of StructInfo to the structure.
 //
 // StructInfo is a set of standard fields with presented in any element
 // ("element" in terms of document #575623).
-func (s *CBnTManifest) SetStructInfo(newStructInfo cbnt.StructInfo) {
-	s.StructInfoCBNT = newStructInfo.(cbnt.StructInfoCBNT)
+func (m *CBnTManifest) SetStructInfo(newStructInfo cbnt.StructInfo) {
+	m.StructInfoCBNT = newStructInfo.(cbnt.StructInfoCBNT)
 }
 
 // ReadFrom reads the Manifest from 'r' in format defined in the document #575623.
-func (s *CBnTManifest) ReadFrom(r io.Reader) (int64, error) {
-	return s.Common.ReadFrom(r, s)
+func (m *CBnTManifest) ReadFrom(r io.Reader) (int64, error) {
+	return m.Common.ReadFrom(r, m)
 }
 
 // RehashRecursive calls Rehash (see below) recursively.
-func (s *CBnTManifest) RehashRecursive() {
-	s.Rehash()
+func (m *CBnTManifest) RehashRecursive() {
+	m.Rehash()
 }
 
 // Rehash sets values which are calculated automatically depending on the rest
 // data. It is usually about the total size field of an element.
-func (s *CBnTManifest) Rehash() {
-	s.Variable0 = 0
-	s.ElementSize = 0
-	v, err := s.OffsetOf(8)
+func (m *CBnTManifest) Rehash() {
+	m.Variable0 = 0
+	m.ElementSize = 0
+	v, err := m.OffsetOf(8)
 	if err != nil {
 		// TODO: this will never be true, but still lets think of how to handle
 	}
-	s.KeyManifestSignatureOffset = uint16(v)
+	m.KeyManifestSignatureOffset = uint16(v)
 }
 
 // WriteTo writes the Manifest into 'w' in format defined in
 // the document #575623.
-func (s *CBnTManifest) WriteTo(w io.Writer) (int64, error) {
-	s.Rehash()
-	return s.Common.WriteTo(w, s)
+func (m *CBnTManifest) WriteTo(w io.Writer) (int64, error) {
+	m.Rehash()
+	return m.Common.WriteTo(w, m)
 }
 
-func (s *CBnTManifest) Layout() []cbnt.LayoutField {
+func (m *CBnTManifest) Layout() []cbnt.LayoutField {
 	return []cbnt.LayoutField{
 		{
 			ID:    0,
 			Name:  "Struct Info",
-			Size:  func() uint64 { return s.StructInfoCBNT.TotalSize() },
-			Value: func() any { return s.StructInfoCBNT },
+			Size:  func() uint64 { return m.StructInfoCBNT.TotalSize() },
+			Value: func() any { return m.StructInfoCBNT },
 			Type:  cbnt.ManifestFieldSubStruct,
 		},
 		{
 			ID:    1,
 			Name:  "Key Manifest Signature Offset",
 			Size:  func() uint64 { return 2 },
-			Value: func() any { return &s.KeyManifestSignatureOffset },
+			Value: func() any { return &m.KeyManifestSignatureOffset },
 			Type:  cbnt.ManifestFieldEndValue,
 		},
 		{
 			ID:    2,
 			Name:  "Reserved 2",
 			Size:  func() uint64 { return 3 },
-			Value: func() any { return &s.Reserved2 },
+			Value: func() any { return &m.Reserved2 },
 			Type:  cbnt.ManifestFieldArrayStatic,
 		},
 		{
 			ID:    3,
 			Name:  "Revision",
 			Size:  func() uint64 { return 1 },
-			Value: func() any { return &s.Revision },
+			Value: func() any { return &m.Revision },
 			Type:  cbnt.ManifestFieldEndValue,
 		},
 		{
 			ID:    4,
 			Name:  "KMSVN",
 			Size:  func() uint64 { return 1 },
-			Value: func() any { return &s.KMSVN },
+			Value: func() any { return &m.KMSVN },
 			Type:  cbnt.ManifestFieldEndValue,
 		},
 		{
 			ID:    5,
 			Name:  "KMID",
 			Size:  func() uint64 { return 1 },
-			Value: func() any { return &s.KMID },
+			Value: func() any { return &m.KMID },
 			Type:  cbnt.ManifestFieldEndValue,
 		},
 		{
 			ID:    6,
 			Name:  "Pub Key Hash Alg",
 			Size:  func() uint64 { return 2 },
-			Value: func() any { return &s.PubKeyHashAlg },
+			Value: func() any { return &m.PubKeyHashAlg },
 			Type:  cbnt.ManifestFieldEndValue,
 		},
 		{
 			ID:   7,
-			Name: fmt.Sprintf("Hash: Array of \"Key Manifest\" of length %d", len(s.Hash)),
+			Name: fmt.Sprintf("Hash: Array of \"Key Manifest\" of length %d", len(m.Hash)),
 			Size: func() uint64 {
 				size := uint64(binary.Size(uint16(0)))
-				for idx := range s.Hash {
-					size += s.Hash[idx].TotalSize()
+				for idx := range m.Hash {
+					size += m.Hash[idx].TotalSize()
 				}
 				return size
 			},
-			Value: func() any { return &s.Hash },
+			Value: func() any { return &m.Hash },
 			Type:  cbnt.ManifestFieldList,
 			ReadList: func(r io.Reader) (int64, error) {
 				var count uint16
@@ -247,9 +247,9 @@ func (s *CBnTManifest) Layout() []cbnt.LayoutField {
 					return 0, fmt.Errorf("unable to read the count for field 'Hash': %w", err)
 				}
 				totalN := int64(binary.Size(count))
-				s.Hash = make([]Hash, count)
-				for idx := range s.Hash {
-					n, err := s.Hash[idx].ReadFrom(r)
+				m.Hash = make([]Hash, count)
+				for idx := range m.Hash {
+					n, err := m.Hash[idx].ReadFrom(r)
 					if err != nil {
 						return totalN, fmt.Errorf("unable to read field 'Hash[%d]': %w", idx, err)
 					}
@@ -258,14 +258,14 @@ func (s *CBnTManifest) Layout() []cbnt.LayoutField {
 				return totalN, nil
 			},
 			WriteList: func(w io.Writer) (int64, error) {
-				count := uint16(len(s.Hash))
+				count := uint16(len(m.Hash))
 				if err := binary.Write(w, binary.LittleEndian, &count); err != nil {
 					return 0, fmt.Errorf("unable to write the count for field 'Hash': %w", err)
 				}
 				totalN := int64(binary.Size(count))
 
-				for idx := range s.Hash {
-					n, err := s.Hash[idx].WriteTo(w)
+				for idx := range m.Hash {
+					n, err := m.Hash[idx].WriteTo(w)
 					if err != nil {
 						return totalN, fmt.Errorf("unable to write field 'Hash[%d]': %w", idx, err)
 					}
@@ -278,15 +278,15 @@ func (s *CBnTManifest) Layout() []cbnt.LayoutField {
 		{
 			ID:    8,
 			Name:  "Key And Signature",
-			Size:  func() uint64 { return s.KeyAndSignature.TotalSize() },
-			Value: func() any { return &s.KeyAndSignature },
+			Size:  func() uint64 { return m.KeyAndSignature.TotalSize() },
+			Value: func() any { return &m.KeyAndSignature },
 			Type:  cbnt.ManifestFieldSubStruct,
 		},
 	}
 }
 
-func (s *CBnTManifest) SizeOf(id int) (uint64, error) {
-	ret, err := s.Common.SizeOf(s, id)
+func (m *CBnTManifest) SizeOf(id int) (uint64, error) {
+	ret, err := m.Common.SizeOf(m, id)
 	if err != nil {
 		return ret, fmt.Errorf("CBnTManifest: %v", err)
 	}
@@ -294,8 +294,8 @@ func (s *CBnTManifest) SizeOf(id int) (uint64, error) {
 	return ret, nil
 }
 
-func (s *CBnTManifest) OffsetOf(id int) (uint64, error) {
-	ret, err := s.Common.OffsetOf(s, id)
+func (m *CBnTManifest) OffsetOf(id int) (uint64, error) {
+	ret, err := m.Common.OffsetOf(m, id)
 	if err != nil {
 		return ret, fmt.Errorf("CBnTManifest: %v", err)
 	}
@@ -304,42 +304,42 @@ func (s *CBnTManifest) OffsetOf(id int) (uint64, error) {
 }
 
 // Size returns the total size of the Manifest.
-func (s *CBnTManifest) TotalSize() uint64 {
-	if s == nil {
+func (m *CBnTManifest) TotalSize() uint64 {
+	if m == nil {
 		return 0
 	}
 
-	return s.Common.TotalSize(s)
+	return m.Common.TotalSize(m)
 }
 
 // PrettyString returns the content of the structure in an easy-to-read format.
-func (s *CBnTManifest) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
+func (m *CBnTManifest) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) string {
 	var lines []string
 	if withHeader {
-		lines = append(lines, pretty.Header(depth, "CBnT Key Manifest", s))
+		lines = append(lines, pretty.Header(depth, "CBnT Key Manifest", m))
 	}
-	if s == nil {
+	if m == nil {
 		return strings.Join(lines, "\n")
 	}
 
-	lines = append(lines, pretty.SubValue(depth+1, "Struct Info", "", &s.StructInfoCBNT, opts...)...)
-	lines = append(lines, pretty.SubValue(depth+1, "Key Manifest Signature Offset", "", &s.KeyManifestSignatureOffset, opts...)...)
-	lines = append(lines, pretty.SubValue(depth+1, "Reserved 2", "", &s.Reserved2, opts...)...)
-	lines = append(lines, pretty.SubValue(depth+1, "Revision", "", &s.Revision, opts...)...)
-	lines = append(lines, pretty.SubValue(depth+1, "KMSVN", "", &s.KMSVN, opts...)...)
-	lines = append(lines, pretty.SubValue(depth+1, "KMID", "", &s.KMID, opts...)...)
-	lines = append(lines, pretty.SubValue(depth+1, "Pub Key Hash Alg", "", &s.PubKeyHashAlg, opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "Struct Info", "", &m.StructInfoCBNT, opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "Key Manifest Signature Offset", "", &m.KeyManifestSignatureOffset, opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "Reserved 2", "", &m.Reserved2, opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "Revision", "", &m.Revision, opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "KMSVN", "", &m.KMSVN, opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "KMID", "", &m.KMID, opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "Pub Key Hash Alg", "", &m.PubKeyHashAlg, opts...)...)
 
 	lines = append(lines, pretty.Header(
 		depth+1,
-		fmt.Sprintf("Hash: Array of \"Key Manifest\" of length %d", len(s.Hash)),
-		s.Hash,
+		fmt.Sprintf("Hash: Array of \"Key Manifest\" of length %d", len(m.Hash)),
+		m.Hash,
 	))
-	for i := 0; i < len(s.Hash); i++ {
+	for i := 0; i < len(m.Hash); i++ {
 		lines = append(
 			lines,
 			fmt.Sprintf("%sitem #%d: ", strings.Repeat("  ", int(depth+2)), i)+
-				strings.TrimSpace(s.Hash[i].PrettyString(depth+2, true, opts...)),
+				strings.TrimSpace(m.Hash[i].PrettyString(depth+2, true, opts...)),
 		)
 	}
 
@@ -347,7 +347,7 @@ func (s *CBnTManifest) PrettyString(depth uint, withHeader bool, opts ...pretty.
 		lines = append(lines, "")
 	}
 
-	lines = append(lines, pretty.SubValue(depth+1, "Key And Signature", "", &s.KeyAndSignature, opts...)...)
+	lines = append(lines, pretty.SubValue(depth+1, "Key And Signature", "", &m.KeyAndSignature, opts...)...)
 
 	if depth < 2 {
 		lines = append(lines, "")
