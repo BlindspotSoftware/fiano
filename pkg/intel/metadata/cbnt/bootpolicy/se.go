@@ -181,8 +181,8 @@ func NewSE(bgv cbnt.BootGuardVersion) (SE, error) {
 		s := &SEBG{}
 		// See 'default' in HashStructure for BG in legacy package
 		hashAlg := 0x0b
-		copy(s.StructInfoBG.ID[:], []byte(StructureIDSE))
-		s.StructInfoBG.Version = 0x10
+		copy(s.ID[:], []byte(StructureIDSE))
+		s.Version = 0x10
 		// Recursively initializing a child structure:
 		s.PostIBBHash = *cbnt.NewHashStructureFill(cbnt.Algorithm(hashAlg))
 		// Recursively initializing a child structure:
@@ -192,14 +192,14 @@ func NewSE(bgv cbnt.BootGuardVersion) (SE, error) {
 		s := &SECBnT{}
 		// See 'default' in HashStructure for CBNT
 		hashAlg := 0x10
-		copy(s.StructInfoCBNT.ID[:], []byte(StructureIDSE))
+		copy(s.ID[:], []byte(StructureIDSE))
 		// Yes, conditional statement inside of switch case
 		// seems hacky. But it saves us from revriting the whole
 		// block an changing just one value (version)
 		if bgv == cbnt.Version20 {
-			s.StructInfoCBNT.Version = 0x20
+			s.Version = 0x20
 		} else {
-			s.StructInfoCBNT.Version = 0x21
+			s.Version = 0x21
 		}
 		// Set through tag "required":
 		s.SetNumber = 0

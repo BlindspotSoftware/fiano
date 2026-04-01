@@ -30,8 +30,8 @@ type PCD struct {
 // all default values set.
 func NewPCD() *PCD {
 	s := &PCD{}
-	copy(s.StructInfoCBNT.ID[:], []byte(StructureIDPCD))
-	s.StructInfoCBNT.Version = 0x20
+	copy(s.ID[:], []byte(StructureIDPCD))
+	s.Version = 0x20
 	s.Rehash()
 	return s
 }
@@ -39,7 +39,7 @@ func NewPCD() *PCD {
 // Validate (recursively) checks the structure if there are any unexpected
 // values. It returns an error if so.
 func (s *PCD) Validate() error {
-	if s.StructInfoCBNT.Version < 0x22 {
+	if s.Version < 0x22 {
 		return nil
 	}
 
@@ -87,11 +87,11 @@ func (s *PCD) Layout() []cbnt.LayoutField {
 				if size == 0 && len(s.Data) != 0 {
 					size = uint16(len(s.Data))
 				}
-				if s.StructInfoCBNT.ElementSize != 0 {
-					base := s.StructInfoCBNT.TotalSize() + 2 + 2
+				if s.ElementSize != 0 {
+					base := s.TotalSize() + 2 + 2
 					guessedSize := base + uint64(size)
-					if guessedSize != uint64(s.StructInfoCBNT.ElementSize) {
-						size = s.StructInfoCBNT.ElementSize - uint16(s.StructInfoCBNT.TotalSize()) - 2 - 2
+					if guessedSize != uint64(s.ElementSize) {
+						size = s.ElementSize - uint16(s.TotalSize()) - 2 - 2
 					}
 				}
 				return uint64(size)
@@ -154,7 +154,7 @@ func (s *PCD) ReadFromHelper(r io.Reader, info bool) (int64, error) {
 		return n, err
 	}
 
-	if s.StructInfoCBNT.Version > 0x21 {
+	if s.Version > 0x21 {
 		rn := bytes.NewReader(s.Data)
 		structInfoSize := binary.Size(cbnt.StructInfoCBNT{})
 
@@ -197,7 +197,7 @@ func (s *PCD) RehashRecursive() {
 // Rehash sets values which are calculated automatically depending on the rest
 // data. It is usually about the total size field of an element.
 func (s *PCD) Rehash() {
-	if s.StructInfoCBNT.Version > 0x21 && len(s.Data) == 0 {
+	if s.Version > 0x21 && len(s.Data) == 0 {
 		var out bytes.Buffer
 		if s.PDRS != nil {
 			_, _ = s.PDRS.WriteTo(&out)
@@ -209,9 +209,9 @@ func (s *PCD) Rehash() {
 			s.Data = out.Bytes()
 		}
 	}
-	s.StructInfoCBNT.Variable0 = 0
+	s.Variable0 = 0
 	binary.LittleEndian.PutUint16(s.SizeOfData[:], uint16(len(s.Data)))
-	s.StructInfoCBNT.ElementSize = uint16(s.StructInfoCBNT.TotalSize() + 2 + 2 + uint64(len(s.Data)))
+	s.ElementSize = uint16(s.TotalSize() + 2 + 2 + uint64(len(s.Data)))
 }
 
 // WriteTo writes the PCD into 'w' in format defined in
@@ -227,8 +227,8 @@ func (s *PCD) TotalSize() uint64 {
 		return 0
 	}
 
-	if s.StructInfoCBNT.ElementSize != 0 {
-		return uint64(s.StructInfoCBNT.ElementSize)
+	if s.ElementSize != 0 {
+		return uint64(s.ElementSize)
 	}
 
 	return s.Common.TotalSize(s)
@@ -240,10 +240,10 @@ func (s *PCD) PrettyString(depth uint, withHeader bool, opts ...pretty.Option) s
 
 	var lines []string
 	lines = append(lines, base)
-	if s.StructInfoCBNT.Version > 0x21 && s.PDRS != nil {
+	if s.Version > 0x21 && s.PDRS != nil {
 		lines = append(lines, s.PDRS.PrettyString(depth, true, opts...))
 	}
-	if s.StructInfoCBNT.Version > 0x21 && s.CNBS != nil {
+	if s.Version > 0x21 && s.CNBS != nil {
 		lines = append(lines, s.CNBS.PrettyString(depth, true, opts...))
 	}
 
@@ -260,8 +260,8 @@ type PDRS struct {
 // NewPDRS returns a new instance of PDRS with all default values set.
 func NewPDRS() *PDRS {
 	s := &PDRS{}
-	copy(s.StructInfoCBNT.ID[:], []byte(StructureIDPDRS))
-	s.StructInfoCBNT.Version = 0x20
+	copy(s.ID[:], []byte(StructureIDPDRS))
+	s.Version = 0x20
 	s.Rehash()
 	return s
 }
@@ -285,8 +285,8 @@ func (s *PDRS) Layout() []cbnt.LayoutField {
 			ID:   1,
 			Name: "Data",
 			Size: func() uint64 {
-				if s.StructInfoCBNT.ElementSize != 0 {
-					return uint64(s.StructInfoCBNT.ElementSize)
+				if s.ElementSize != 0 {
+					return uint64(s.ElementSize)
 				}
 				return uint64(len(s.Data))
 			},
@@ -354,8 +354,8 @@ func (s *PDRS) RehashRecursive() {
 // Rehash sets values which are calculated automatically depending on the rest
 // data. It is usually about the total size field of an element.
 func (s *PDRS) Rehash() {
-	s.StructInfoCBNT.Variable0 = 0
-	s.StructInfoCBNT.ElementSize = uint16(len(s.Data))
+	s.Variable0 = 0
+	s.ElementSize = uint16(len(s.Data))
 }
 
 // WriteTo writes the PDRS into 'w' in format defined in
@@ -371,8 +371,8 @@ func (s *PDRS) TotalSize() uint64 {
 		return 0
 	}
 
-	if s.StructInfoCBNT.ElementSize != 0 {
-		return uint64(s.StructInfoCBNT.TotalSize()) + uint64(s.StructInfoCBNT.ElementSize)
+	if s.ElementSize != 0 {
+		return uint64(s.TotalSize()) + uint64(s.ElementSize)
 	}
 
 	return s.Common.TotalSize(s)
@@ -393,8 +393,8 @@ type CNBS struct {
 // NewCNBS returns a new instance of CNBS with all default values set.
 func NewCNBS() *CNBS {
 	s := &CNBS{}
-	copy(s.StructInfoCBNT.ID[:], []byte(StructureIDCNBS))
-	s.StructInfoCBNT.Version = 0x20
+	copy(s.ID[:], []byte(StructureIDCNBS))
+	s.Version = 0x20
 	s.Rehash()
 	return s
 }
@@ -486,8 +486,8 @@ func (s *CNBS) RehashRecursive() {
 // Rehash sets values which are calculated automatically depending on the rest
 // data. It is usually about the total size field of an element.
 func (s *CNBS) Rehash() {
-	s.StructInfoCBNT.Variable0 = 0
-	s.StructInfoCBNT.ElementSize = uint16(s.BufferData.TotalSize())
+	s.Variable0 = 0
+	s.ElementSize = uint16(s.BufferData.TotalSize())
 }
 
 // WriteTo writes the CNBS into 'w' in format defined in
@@ -503,8 +503,8 @@ func (s *CNBS) TotalSize() uint64 {
 		return 0
 	}
 
-	if s.StructInfoCBNT.ElementSize != 0 {
-		return uint64(s.StructInfoCBNT.TotalSize()) + uint64(s.StructInfoCBNT.ElementSize)
+	if s.ElementSize != 0 {
+		return uint64(s.TotalSize()) + uint64(s.ElementSize)
 	}
 
 	return s.Common.TotalSize(s)

@@ -23,13 +23,13 @@ func NewPM(bgv cbnt.BootGuardVersion) (PM, error) {
 	switch bgv {
 	case cbnt.Version10:
 		s := &PMBG{}
-		copy(s.StructInfoBG.ID[:], []byte(StructureIDPM))
-		s.StructInfoBG.Version = 0x10
+		copy(s.ID[:], []byte(StructureIDPM))
+		s.Version = 0x10
 		return s, nil
 	case cbnt.Version20, cbnt.Version21:
 		s := &PMCBnT{}
-		copy(s.StructInfoCBNT.ID[:], []byte(StructureIDPM))
-		s.StructInfoCBNT.Version = 0x20
+		copy(s.ID[:], []byte(StructureIDPM))
+		s.Version = 0x20
 		s.Rehash()
 		return s, nil
 	default:

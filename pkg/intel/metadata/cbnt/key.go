@@ -144,7 +144,8 @@ func (k *Key) PrintBPMPubKey(bpmAlg Algorithm) error {
 		if err != nil {
 			return err
 		}
-		if k.KeyAlg == AlgRSA {
+		switch k.KeyAlg {
+		case AlgRSA:
 			if err := binary.Write(buf, binary.LittleEndian, k.Data[4:]); err != nil {
 				return err
 			}
@@ -152,7 +153,7 @@ func (k *Key) PrintBPMPubKey(bpmAlg Algorithm) error {
 				return fmt.Errorf("unable to hash: %w", err)
 			}
 			fmt.Printf("   Boot Policy Manifest Pubkey Hash: 0x%x\n", hash.Sum(nil))
-		} else if k.KeyAlg == AlgSM2 || k.KeyAlg == AlgECC {
+		case AlgSM2, AlgECC:
 			if err := binary.Write(buf, binary.LittleEndian, k.Data); err != nil {
 				return err
 			}
@@ -160,7 +161,7 @@ func (k *Key) PrintBPMPubKey(bpmAlg Algorithm) error {
 				return fmt.Errorf("unable to hash: %w", err)
 			}
 			fmt.Printf("   Boot Policy Manifest Pubkey Hash: 0x%x\n", hash.Sum(nil))
-		} else {
+		default:
 			fmt.Printf("   Boot Policy Manifest Pubkey Hash: Unknown Algorithm\n")
 		}
 	} else {

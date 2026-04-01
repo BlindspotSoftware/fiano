@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// Package cbntbootpolicy provides Boot Policy Manifest and its child
+// structures representation
 package cbntbootpolicy
 
 import (
@@ -440,8 +442,8 @@ func (s *ManifestBG) ReadFrom(r io.Reader) (returnN int64, returnErr error) {
 			if fieldIndex == previousFieldIndex {
 				return totalN, fmt.Errorf("field 'BPMH' is not a slice, but multiple elements found")
 			}
-			s.BPMHBG.SetStructInfo(structInfo)
-			n, err = s.BPMHBG.ReadFromHelper(r, false)
+			s.SetStructInfo(structInfo)
+			n, err = s.ReadFromHelper(r, false)
 			if err != nil {
 				return totalN, fmt.Errorf("unable to read field BPMH at %d: %w", totalN, err)
 			}
@@ -531,15 +533,15 @@ func (s *ManifestBG) PrettyString(depth uint, withHeader bool, opts ...pretty.Op
 }
 
 func (s *ManifestBG) StructInfo() cbnt.StructInfo {
-	return s.BPMHBG.StructInfoBG
+	return s.StructInfoBG
 }
 
 func (s *ManifestBG) GetStructInfo() cbnt.StructInfo {
-	return s.BPMHBG.StructInfoBG
+	return s.StructInfoBG
 }
 
 func (s *ManifestBG) SetStructInfo(newStructInfo cbnt.StructInfo) {
-	s.BPMHBG.StructInfoBG = newStructInfo.(cbnt.StructInfoBG)
+	s.StructInfoBG = newStructInfo.(cbnt.StructInfoBG)
 }
 
 func (bpm *ManifestBG) ValidateIBB(firmware uefi.Firmware) error {
@@ -835,8 +837,8 @@ func (s *ManifestCBnT) ReadFrom(r io.Reader) (returnN int64, returnErr error) {
 			if fieldIndex == previousFieldIndex {
 				return totalN, fmt.Errorf("field 'BPMH' is not a slice, but multiple elements found")
 			}
-			s.BPMHCBnT.SetStructInfo(structInfo)
-			n, err = s.BPMHCBnT.ReadFromHelper(r, false)
+			s.SetStructInfo(structInfo)
+			n, err = s.ReadFromHelper(r, false)
 			if err != nil {
 				return totalN, fmt.Errorf("unable to read field BPMH at %d: %w", totalN, err)
 			}
@@ -977,15 +979,15 @@ func (s *ManifestCBnT) PrettyString(depth uint, withHeader bool, opts ...pretty.
 }
 
 func (s *ManifestCBnT) StructInfo() cbnt.StructInfo {
-	return s.BPMHCBnT.StructInfoCBNT
+	return s.StructInfoCBNT
 }
 
 func (s *ManifestCBnT) GetStructInfo() cbnt.StructInfo {
-	return s.BPMHCBnT.StructInfoCBNT
+	return s.StructInfoCBNT
 }
 
 func (s *ManifestCBnT) SetStructInfo(newStructInfo cbnt.StructInfo) {
-	s.BPMHCBnT.StructInfoCBNT = newStructInfo.(cbnt.StructInfoCBNT)
+	s.StructInfoCBNT = newStructInfo.(cbnt.StructInfoCBNT)
 }
 
 // ValidateIBB returns an error if IBB segments does not match the signature.

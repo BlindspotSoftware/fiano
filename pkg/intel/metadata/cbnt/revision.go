@@ -15,6 +15,7 @@ import (
 // of handling the header is the same (afaik Intel didn't changed
 // anything there), and we only have to treat headers from 21 to 25
 // as 20.
+
 type BootGuardVersion uint8
 
 func (bgv BootGuardVersion) String() string {

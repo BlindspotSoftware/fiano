@@ -49,11 +49,11 @@ func TestKeySetPubKeyAndPubKeyRSA(t *testing.T) {
 		t.Fatalf("Key.PubKey() type = %T, want %T", gotPub, &rsa.PublicKey{})
 	}
 
-	if rsaPub.E != key.PublicKey.E {
-		t.Errorf("Key.PubKey().E = %d, want %d", rsaPub.E, key.PublicKey.E)
+	if rsaPub.E != key.E {
+		t.Errorf("Key.PubKey().E = %d, want %d", rsaPub.E, key.E)
 	}
-	if rsaPub.N.Cmp(key.PublicKey.N) != 0 {
-		t.Errorf("Key.PubKey().N = %x, want %x", rsaPub.N.Bytes(), key.PublicKey.N.Bytes())
+	if rsaPub.N.Cmp(key.N) != 0 {
+		t.Errorf("Key.PubKey().N = %x, want %x", rsaPub.N.Bytes(), key.N.Bytes())
 	}
 }
 
@@ -74,11 +74,11 @@ func TestKeySetPubKeyAndPubKeyECDSA(t *testing.T) {
 		t.Fatalf("Key.PubKey() type = %T, want %T", gotPub, ecdsa.PublicKey{})
 	}
 
-	if ecdsaPub.X.Cmp(key.PublicKey.X) != 0 {
-		t.Errorf("Key.PubKey().X = %x, want %x", ecdsaPub.X.Bytes(), key.PublicKey.X.Bytes())
+	if ecdsaPub.X.Cmp(key.X) != 0 {
+		t.Errorf("Key.PubKey().X = %x, want %x", ecdsaPub.X.Bytes(), key.X.Bytes())
 	}
-	if ecdsaPub.Y.Cmp(key.PublicKey.Y) != 0 {
-		t.Errorf("Key.PubKey().Y = %x, want %x", ecdsaPub.Y.Bytes(), key.PublicKey.Y.Bytes())
+	if ecdsaPub.Y.Cmp(key.Y) != 0 {
+		t.Errorf("Key.PubKey().Y = %x, want %x", ecdsaPub.Y.Bytes(), key.Y.Bytes())
 	}
 }
 
@@ -234,7 +234,7 @@ func ecdsaP256with32b(t *testing.T) *ecdsa.PrivateKey {
 		if err != nil {
 			t.Fatalf("ecdsa.GenerateKey() error = %v, want nil", err)
 		}
-		if len(k.PublicKey.X.Bytes()) == 32 && len(k.PublicKey.Y.Bytes()) == 32 {
+		if len(k.X.Bytes()) == 32 && len(k.Y.Bytes()) == 32 {
 			return k
 		}
 	}

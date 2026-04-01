@@ -26,19 +26,19 @@ func NewBPMH(bgv cbnt.BootGuardVersion) (BPMH, error) {
 	switch bgv {
 	case cbnt.Version10:
 		s := &BPMHBG{}
-		copy(s.StructInfoBG.ID[:], []byte(StructureIDBPMH))
-		s.StructInfoBG.Version = 0x10
+		copy(s.ID[:], []byte(StructureIDBPMH))
+		s.Version = 0x10
 		return s, nil
 	case cbnt.Version20:
 		s := &BPMHCBnT{}
-		copy(s.StructInfoCBNT.ID[:], []byte(StructureIDBPMH))
-		s.StructInfoCBNT.Version = 0x23
+		copy(s.ID[:], []byte(StructureIDBPMH))
+		s.Version = 0x23
 		s.Rehash()
 		return s, nil
 	case cbnt.Version21:
 		s := &BPMHCBnT{}
-		copy(s.StructInfoCBNT.ID[:], []byte(StructureIDBPMH))
-		s.StructInfoCBNT.Version = 0x24
+		copy(s.ID[:], []byte(StructureIDBPMH))
+		s.Version = 0x24
 		s.Rehash()
 		return s, nil
 	default:
@@ -196,8 +196,8 @@ func (s *BPMHCBnT) RehashRecursive() {
 // Rehash sets values which are calculated automatically depending on the rest
 // data. It is usually about the total size field of an element.
 func (s *BPMHCBnT) Rehash() {
-	s.StructInfoCBNT.Variable0 = 0x20
-	s.StructInfoCBNT.ElementSize = uint16(s.Common.TotalSize(s))
+	s.Variable0 = 0x20
+	s.ElementSize = uint16(s.Common.TotalSize(s))
 }
 
 // WriteTo writes the BPMH into 'w' in format defined in

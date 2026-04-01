@@ -23,8 +23,8 @@ type Reserved struct {
 func NewReserved() *Reserved {
 	// Only present in CBnT, thus we assume StructInfoCBNT.
 	s := &Reserved{}
-	copy(s.StructInfoCBNT.ID[:], []byte(StructureIDReserved))
-	s.StructInfoCBNT.Version = 0x21
+	copy(s.ID[:], []byte(StructureIDReserved))
+	s.Version = 0x21
 	s.Rehash()
 	return s
 }
@@ -117,8 +117,8 @@ func (s *Reserved) RehashRecursive() {
 // Rehash sets values which are calculated automatically depending on the rest
 // data. It is usually about the total size field of an element.
 func (s *Reserved) Rehash() {
-	s.StructInfoCBNT.Variable0 = 0
-	s.StructInfoCBNT.ElementSize = uint16(s.TotalSize())
+	s.Variable0 = 0
+	s.ElementSize = uint16(s.TotalSize())
 }
 
 // WriteTo writes the Reserved into 'w' in format defined in

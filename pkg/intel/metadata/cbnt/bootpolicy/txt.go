@@ -42,8 +42,8 @@ type TXT struct {
 // all default values set.
 func NewTXT() *TXT {
 	s := &TXT{}
-	copy(s.StructInfoCBNT.ID[:], []byte(StructureIDTXT))
-	s.StructInfoCBNT.Version = 0x21
+	copy(s.ID[:], []byte(StructureIDTXT))
+	s.Version = 0x21
 	// Set through tag "default":
 	s.SInitMinSVNAuth = 0
 	// Set through tag "default":

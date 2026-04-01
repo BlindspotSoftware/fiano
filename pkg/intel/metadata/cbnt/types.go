@@ -1,6 +1,7 @@
 // Copyright 2017-2026 the LinuxBoot Authors. All rights reserved
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
+
 package cbnt
 
 import (
@@ -53,7 +54,7 @@ type (
 		Structure
 	}
 
-	// An abstraction of slice of Structures
+	// StructureList is an abstraction of slice of Structures
 	StructureList interface {
 		Structures() []Structure
 	}

@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// Package cbntkey provides Key Manifest representation.
 package cbntkey
 
 import (
@@ -28,15 +29,15 @@ func NewManifest(bgv cbnt.BootGuardVersion) (Manifest, error) {
 	case cbnt.Version10:
 		s := &BGManifest{}
 		s.StructInfoBG = *cbnt.NewStructInfo(cbnt.Version10).(*cbnt.StructInfoBG)
-		s.StructInfoBG.Version = 0x10
-		copy(s.StructInfoBG.ID[:], []byte(cbnt.StructureIDManifest))
+		s.Version = 0x10
+		copy(s.ID[:], []byte(cbnt.StructureIDManifest))
 		s.KeyAndSignature = *cbnt.NewKeySignature()
 		return s, nil
 	case cbnt.Version20, cbnt.Version21:
 		s := &CBnTManifest{}
 		s.StructInfoCBNT = *cbnt.NewStructInfo(cbnt.Version20).(*cbnt.StructInfoCBNT)
-		s.StructInfoCBNT.Version = 0x21
-		copy(s.StructInfoCBNT.ID[:], []byte(cbnt.StructureIDManifest))
+		s.Version = 0x21
+		copy(s.ID[:], []byte(cbnt.StructureIDManifest))
 		s.KeyAndSignature = *cbnt.NewKeySignature()
 		return s, nil
 	default:
