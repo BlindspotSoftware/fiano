@@ -272,7 +272,7 @@ func (s *ManifestCBnT) UnmarshalJSON(data []byte) error {
 // fieldIndexByStructID returns the position index within
 // structure Manifest of the field by its StructureID
 // (see document #575623, an example of StructureID value is "__KEYM__").
-func (_ ManifestBG) fieldIndexByStructID(structID string) int {
+func (ManifestBG) fieldIndexByStructID(structID string) int {
 	switch structID {
 	case StructureIDBPMH:
 		return 0
@@ -289,7 +289,7 @@ func (_ ManifestBG) fieldIndexByStructID(structID string) int {
 
 // fieldNameByIndex returns the name of the field by its position number
 // within structure Manifest.
-func (_ ManifestBG) fieldNameByIndex(fieldIndex int) string {
+func (ManifestBG) fieldNameByIndex(fieldIndex int) string {
 	switch fieldIndex {
 	case 0:
 		return "BPMH"
@@ -598,7 +598,7 @@ func (s ManifestBG) Print() {
 	}
 }
 
-func (_ ManifestCBnT) fieldIndexByStructID(structID string) int {
+func (ManifestCBnT) fieldIndexByStructID(structID string) int {
 	switch structID {
 	case StructureIDBPMH:
 		return 0
@@ -619,7 +619,7 @@ func (_ ManifestCBnT) fieldIndexByStructID(structID string) int {
 	return -1
 }
 
-func (_ ManifestCBnT) fieldNameByIndex(fieldIndex int) string {
+func (ManifestCBnT) fieldNameByIndex(fieldIndex int) string {
 	switch fieldIndex {
 	case 0:
 		return "BPMH"
