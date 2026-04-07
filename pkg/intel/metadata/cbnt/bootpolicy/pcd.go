@@ -88,10 +88,10 @@ func (s *PCD) Layout() []cbnt.LayoutField {
 					size = uint16(len(s.Data))
 				}
 				if s.ElementSize != 0 {
-					base := s.TotalSize() + 2 + 2
+					base := s.StructInfoCBNT.TotalSize() + 2 + 2
 					guessedSize := base + uint64(size)
 					if guessedSize != uint64(s.ElementSize) {
-						size = s.ElementSize - uint16(s.TotalSize()) - 2 - 2
+						size = s.StructInfoCBNT.ElementSize - uint16(s.StructInfoCBNT.TotalSize()) - 2 - 2
 					}
 				}
 				return uint64(size)
@@ -211,7 +211,7 @@ func (s *PCD) Rehash() {
 	}
 	s.Variable0 = 0
 	binary.LittleEndian.PutUint16(s.SizeOfData[:], uint16(len(s.Data)))
-	s.ElementSize = uint16(s.TotalSize() + 2 + 2 + uint64(len(s.Data)))
+	s.ElementSize = uint16(s.StructInfoCBNT.TotalSize() + 2 + 2 + uint64(len(s.Data)))
 }
 
 // WriteTo writes the PCD into 'w' in format defined in
@@ -372,7 +372,7 @@ func (s *PDRS) TotalSize() uint64 {
 	}
 
 	if s.ElementSize != 0 {
-		return uint64(s.TotalSize()) + uint64(s.ElementSize)
+		return uint64(s.StructInfo().TotalSize()) + uint64(s.ElementSize)
 	}
 
 	return s.Common.TotalSize(s)
@@ -504,7 +504,7 @@ func (s *CNBS) TotalSize() uint64 {
 	}
 
 	if s.ElementSize != 0 {
-		return uint64(s.TotalSize()) + uint64(s.ElementSize)
+		return uint64(s.StructInfo().TotalSize()) + uint64(s.ElementSize)
 	}
 
 	return s.Common.TotalSize(s)
