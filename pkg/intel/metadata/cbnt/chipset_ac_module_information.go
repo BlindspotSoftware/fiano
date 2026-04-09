@@ -63,7 +63,6 @@ func ParseChipsetACModuleInformation(r io.Reader) (ChipsetACModuleInformation, e
 		if err != nil {
 			return ChipsetACModuleInformation{}, err
 		}
-		fmt.Printf("0x%x\n", acm.TPMInfoList)
 	}
 
 	return *acm, nil

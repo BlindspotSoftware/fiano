@@ -428,7 +428,7 @@ func (s *ManifestBG) ReadFrom(r io.Reader) (returnN int64, returnErr error) {
 		structID := structInfo.ID.String()
 		fieldIndex := s.fieldIndexByStructID(structID)
 		if fieldIndex < 0 {
-			return totalN, nil
+			return totalN, fmt.Errorf("unknown structure ID: %s\n", structID)
 		}
 		totalN += int64(binary.Size(structInfo))
 		if cbnt.StrictOrderCheck && fieldIndex < previousFieldIndex {
@@ -823,7 +823,7 @@ func (s *ManifestCBnT) ReadFrom(r io.Reader) (returnN int64, returnErr error) {
 		structID := structInfo.ID.String()
 		fieldIndex := s.fieldIndexByStructID(structID)
 		if fieldIndex < 0 {
-			return totalN, nil
+			return totalN, fmt.Errorf("unknown structure ID: %s\n", structID)
 		}
 		totalN += int64(binary.Size(structInfo))
 		if cbnt.StrictOrderCheck && fieldIndex < previousFieldIndex {

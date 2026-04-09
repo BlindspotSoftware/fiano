@@ -166,6 +166,7 @@ func (m *CBnTManifest) Rehash() {
 	v, err := m.OffsetOf(8)
 	if err != nil {
 		// TODO: this will never be true, but still lets think of how to handle
+		fmt.Println("offset fail (todo handle better)")
 	}
 	m.KeyManifestSignatureOffset = uint16(v)
 }

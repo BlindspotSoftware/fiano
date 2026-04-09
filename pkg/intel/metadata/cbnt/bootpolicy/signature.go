@@ -109,7 +109,7 @@ func (s *Signature) SetStructInfo(newStructInfo cbnt.StructInfo) {
 
 // Dummy helper to satisfy cbnt.Structure Interface
 func (s *Signature) ReadFrom(r io.Reader, info bool) (int64, error) {
-	return s.ReadFromHelper(r, true)
+	return s.ReadFromHelper(r, info)
 }
 
 // ReadFrom reads the Signature from 'r' in format defined in the document #575623.
