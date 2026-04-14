@@ -101,11 +101,9 @@ func (u *Usage) Set(f Usage, v bool) {
 
 // NewHash returns a new instance of Hash with
 // all default values set.
-func NewHash() *Hash {
+func NewHash(alg cbnt.Algorithm) *Hash {
 	s := &Hash{}
-	// Recursively initializing a child structure:
-	// s.Digest = *cbnt.NewHashStructure()
-	// s.Rehash()
+	s.Digest = *cbnt.NewHashStructure(alg)
 	return s
 }
 
@@ -114,7 +112,7 @@ func NewHash() *Hash {
 func (s *Hash) Validate() error {
 	// Recursively validating a child structure:
 	// if err := s.Digest.Validate(); err != nil {
-	// 	return fmt.Errorf("error on field 'Digest': %w", err)
+	//      return fmt.Errorf("error on field 'Digest': %w", err)
 	// }
 
 	return nil

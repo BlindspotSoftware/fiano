@@ -87,8 +87,7 @@ func (s *PMCBnT) Layout() []cbnt.LayoutField {
 			Size: func() uint64 {
 				// TODO: verify
 				size := uint64(binary.Size(uint16(0)))
-				size += uint64(s.DataSize[0])
-				size += uint64(s.DataSize[1])
+				size += uint64(binary.Size(s.DataSize))
 				return size
 			},
 			Value: func() any { return &s.Data },

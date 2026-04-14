@@ -428,7 +428,9 @@ func (s *ManifestBG) ReadFrom(r io.Reader) (returnN int64, returnErr error) {
 		structID := structInfo.ID.String()
 		fieldIndex := s.fieldIndexByStructID(structID)
 		if fieldIndex < 0 {
-			return totalN, fmt.Errorf("unknown structure ID: %s\n", structID)
+			// Let's just warn about unknown struct, no need to fail completly
+			fmt.Printf("warning: unknown structure ID: %s\n", structID)
+			continue
 		}
 		totalN += int64(binary.Size(structInfo))
 		if cbnt.StrictOrderCheck && fieldIndex < previousFieldIndex {
@@ -555,7 +557,12 @@ func (s *ManifestBG) ValidateIBB(firmware uefi.Firmware) error {
 		return fmt.Errorf("invalid hash function: %v", digest.HashAlg)
 	}
 
-	for _, r := range s.IBBDataRanges(uint64(len(firmware.Buf()))) {
+	imgSize := uint64((len(firmware.Buf())))
+	if ifdSize, ifdErr := FlashSizeIFD(firmware.Buf()); ifdErr == nil && ifdSize > 0 && ifdSize <= imgSize {
+		imgSize = ifdSize
+	}
+
+	for _, r := range s.IBBDataRanges(imgSize) {
 		if _, err := h.Write(firmware.Buf()[r.Offset:r.End()]); err != nil {
 			return fmt.Errorf("unable to hash: %w", err)
 		}
@@ -652,8 +659,10 @@ func (s *ManifestCBnT) Validate() error {
 		return fmt.Errorf("error on field 'PMSE': %w", err)
 	}
 
-	if err := s.PCDE.Validate(); err != nil {
-		return fmt.Errorf("error on field 'PCDE': %w", err)
+	if s.PCDE != nil {
+		if err := s.PCDE.Validate(); err != nil {
+			return fmt.Errorf("error on field 'PCDE': %w", err)
+		}
 	}
 
 	return nil
@@ -823,7 +832,8 @@ func (s *ManifestCBnT) ReadFrom(r io.Reader) (returnN int64, returnErr error) {
 		structID := structInfo.ID.String()
 		fieldIndex := s.fieldIndexByStructID(structID)
 		if fieldIndex < 0 {
-			return totalN, fmt.Errorf("unknown structure ID: %s\n", structID)
+			fmt.Printf("warning: unknown structure ID: %s\n", structID)
+			continue
 		}
 		totalN += int64(binary.Size(structInfo))
 		if cbnt.StrictOrderCheck && fieldIndex < previousFieldIndex {
@@ -1002,7 +1012,12 @@ func (s *ManifestCBnT) ValidateIBB(firmware uefi.Firmware) error {
 		return fmt.Errorf("invalid hash function: %v", digest.HashAlg)
 	}
 
-	for _, r := range s.IBBDataRanges(uint64(len(firmware.Buf()))) {
+	imgSize := uint64((len(firmware.Buf())))
+	if ifdSize, ifdErr := FlashSizeIFD(firmware.Buf()); ifdErr == nil && ifdSize > 0 && ifdSize <= imgSize {
+		imgSize = ifdSize
+	}
+
+	for _, r := range s.IBBDataRanges(imgSize) {
 		if _, err := h.Write(firmware.Buf()[r.Offset:r.End()]); err != nil {
 			return fmt.Errorf("unable to hash: %w", err)
 		}
@@ -1030,7 +1045,7 @@ func ibbDataRanges(segments []IBBSegment, firmwareSize uint64) pkgbytes.Ranges {
 		if seg.Flags&1 == 1 {
 			continue
 		}
-		startIdx := calculateOffsetFromPhysAddr(uint64(seg.Base), firmwareSize)
+		startIdx := CalculateOffsetFromPhysAddr(uint64(seg.Base), firmwareSize)
 		result = append(result, pkgbytes.Range{Offset: startIdx, Length: uint64(seg.Size)})
 	}
 
@@ -1038,10 +1053,39 @@ func ibbDataRanges(segments []IBBSegment, firmwareSize uint64) pkgbytes.Ranges {
 }
 
 // calculateOffsetFromPhysAddr calculates the offset within an image of a physical address.
-func calculateOffsetFromPhysAddr(physAddr uint64, imageSize uint64) uint64 {
+func CalculateOffsetFromPhysAddr(physAddr uint64, imageSize uint64) uint64 {
 	const basePhysAddr = 1 << 32
 	startAddr := basePhysAddr - imageSize
 	return physAddr - startAddr
+}
+
+func FlashSizeIFD(buf []byte) (uint64, error) {
+	if uint64(len(buf)) < uefi.FlashDescriptorLength {
+		return 0, fmt.Errorf("buffer too small for flash descriptior: %d", len(buf))
+	}
+
+	fd := uefi.FlashDescriptor{}
+	fd.SetBuf(buf[:uefi.FlashDescriptorLength])
+	if err := fd.ParseFlashDescriptor(); err != nil {
+		return 0, err
+	}
+
+	var maxEnd uint64
+	for _, fr := range fd.Region.FlashRegions {
+		if !fr.Valid() {
+			continue
+		}
+		end := uint64(fr.EndOffset())
+		if end > maxEnd {
+			maxEnd = end
+		}
+	}
+	if maxEnd == 0 {
+		return 0, fmt.Errorf("no valid regions in flash descriptor")
+	}
+
+	return maxEnd, nil
+
 }
 
 func (s *ManifestCBnT) rehashedBPMH() BPMHCBnT {
